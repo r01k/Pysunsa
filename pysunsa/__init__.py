@@ -42,6 +42,13 @@ class Pysunsa:
         return self._devices
 
     async def update_device(self, device_id, position: int):
+        """
+        Set the blinds position.
+        :param int device_id:
+        :param int position: The position of the blinds, can be increments of 10 \
+        from -100 to 100, where 0 is open, -100 is closed in one direction and 100 is \
+        closed in the other direction.
+        """
         await self.send_command(
             request=POST,
             api_method=f"devices/{device_id}",
