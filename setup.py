@@ -11,8 +11,8 @@ VERSION = "0.0.1"
 setup(
     name="pysunsa",
     version=VERSION,
-    url="https://github.com/r01k/pysunsa",
-    download_url="https://github.com/r01k/pysunsa",
+    url="https://github.com/r01k/Pysunsa",
+    download_url="https://github.com/r01k/Pysunsa",
     author="r01k",
     author_email="rk01k@yahoo.com",
     description="Python wrapper for Sunsa smart blind wands REST API",
