@@ -1,3 +1,5 @@
+
+
 class PysunsaError(Exception):
     """Raised when Pysunsa request ends in error.
     Attributes:

@@ -11,35 +11,32 @@ _LOGGER = logging.getLogger(__name__)
 RESPONSE_STATUS = "status"
 RESPONSE_STATUSTEXT = "statustext"
 RESPONSE_ERRORSTATUS = "Error"
+POSITION = "position"
+OPEN_POSITION = 0
+CLOSED_POSITION = 100
+VERTICAL = "vertical"
+HORIZONTAL = "horizontal"
+# TODO Check movements for horizontal blinds
+UP = "up"
+DOWN = "down"
+RIGHT = "right"
+LEFT = "left"
 GET = "get"
 POST = "put"
+TYPE_MOVEMENT_MAP = {
+    VERTICAL: (RIGHT, LEFT),
+    HORIZONTAL: (UP, DOWN)
+}
 
 
 class Pysunsa:
     """Sunsa REST API client"""
+
     def __init__(self, session, userid: int, apikey: str):
         self._rh = _RequestsHandler(session, userid, apikey)
-        self._devices = None
-
-    async def send_command(self, request, api_method, **data):
-        data = await self._rh.query(request=request, method=api_method, data=data)
-        if RESPONSE_STATUS in data and data[RESPONSE_STATUS] == RESPONSE_ERRORSTATUS:
-            raise PysunsaError(RESPONSE_ERRORSTATUS, data[RESPONSE_STATUSTEXT])
-        return data
 
     async def get_devices(self):
-        result = await self.send_command(GET, "devices")
-        self._devices = result["devices"]
-        return self._devices
-
-    async def get_device_info(self, device_id):
-        for device in await self.get_devices():
-            if device["idDevice"] == device_id:
-                return device
-
-    @property
-    def devices(self):
-        return self._devices
+        return await self._send_command(GET, "devices")
 
     async def update_device(self, device_id, position: int):
         """
@@ -49,11 +46,22 @@ class Pysunsa:
         from -100 to 100, where 0 is open, -100 is closed in one direction and 100 is \
         closed in the other direction.
         """
-        await self.send_command(
+        await self._send_command(
             request=POST,
             api_method=f"devices/{device_id}",
             position=position
         )
+
+    async def _send_command(self, request, api_method, **data):
+        data = await self._rh.query(request=request, method=api_method, data=data)
+        if RESPONSE_STATUS in data and data[RESPONSE_STATUS] == RESPONSE_ERRORSTATUS:
+            raise PysunsaError(RESPONSE_ERRORSTATUS, data[RESPONSE_STATUSTEXT])
+        return data
+
+    async def get_device_info(self, device_id):
+        for device in await self.get_devices():
+            if device["idDevice"] == device_id:
+                return device
 
 
 class _RequestsHandler:
