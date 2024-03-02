@@ -35,10 +35,11 @@ class Pysunsa:
     def __init__(self, session, userid: int, apikey: str):
         self._rh = _RequestsHandler(session, userid, apikey)
 
-    async def get_devices(self):
-        return await self._send_command(GET, "devices")
+    async def get_devices(self) -> dict:
+        result = await self._send_command(GET, "devices")
+        return result["devices"]
 
-    async def update_device(self, device_id, position: int):
+    async def update_device(self, device_id, position: int) -> None:
         """
         Set the blinds position.
         :param int device_id:
@@ -52,13 +53,13 @@ class Pysunsa:
             position=position
         )
 
-    async def _send_command(self, request, api_method, **data):
+    async def _send_command(self, request, api_method, **data) -> dict:
         data = await self._rh.query(request=request, method=api_method, data=data)
         if RESPONSE_STATUS in data and data[RESPONSE_STATUS] == RESPONSE_ERRORSTATUS:
             raise PysunsaError(RESPONSE_ERRORSTATUS, data[RESPONSE_STATUSTEXT])
         return data
 
-    async def get_device_info(self, device_id):
+    async def get_device_info(self, device_id) -> dict:
         for device in await self.get_devices():
             if device["idDevice"] == device_id:
                 return device
