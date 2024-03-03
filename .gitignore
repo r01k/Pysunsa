@@ -82,6 +82,7 @@ Scripts/
 venv.bat
 secrets.json
 client.py
+samples/
 
 # vimmy stuff
 *.swp
